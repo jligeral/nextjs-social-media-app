@@ -1,35 +1,33 @@
 "use client";
 
 import {useForm} from "react-hook-form";
-import {SignUpValues, signUpSchema} from "@/lib/validation";
+import {LoginValues, loginSchema} from "@/lib/validation";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormField, FormMessage, FormControl, FormItem, FormLabel} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
 import {useState, useTransition} from "react";
-import {signUp} from "@/app/(auth)/signup/actions";
+import {login} from "@/app/(auth)/login/actions";
 import {PasswordInput} from "@/components/PasswordInput";
 import LoadingButton from "@/components/LoadingButton";
 
-export default function SignUpForm() {
+export default function LoginForm() {
 
   const [error, setError] = useState<string>();
 
   const [isPending, startTransition] = useTransition();
 
-  const form =useForm<SignUpValues>({
-    resolver: zodResolver(signUpSchema),
+  const form =useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
       username: "",
       password: "",
     }
   });
 
-  async function onSubmit(values: SignUpValues) {
+  async function onSubmit(values: LoginValues) {
     setError(undefined);
     startTransition(async () => {
-      const {error} = await signUp(values);
+      const {error} = await login(values);
       if (error) setError(error);
     })
   }
@@ -52,19 +50,6 @@ export default function SignUpForm() {
       />
       <FormField
         control={form.control}
-        name="email"
-        render={({field}) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input placeholder="Email" type="email" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
         name="password"
         render={({field}) => (
           <FormItem>
@@ -80,7 +65,7 @@ export default function SignUpForm() {
         loading={isPending}
         type="submit"
         className="w-full">
-        Create Account
+        Log In
       </LoadingButton>
     </form>
   </Form>;
