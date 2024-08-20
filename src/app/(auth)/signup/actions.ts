@@ -24,7 +24,7 @@ export async function signUp(
 
     const userId = generateIdFromEntropySize(10);
 
-    const existingUsename = await prisma.user.findFirst({
+    const existingUsername = await prisma.user.findFirst({
       where: {
         username: {
           equals: username,
@@ -33,7 +33,7 @@ export async function signUp(
       }
     })
 
-    if(existingUsename) {
+    if(existingUsername) {
       return {error: "Username already exists"};
     }
 
