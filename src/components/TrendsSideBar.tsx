@@ -79,7 +79,7 @@ const getTrendingTopics= unstable_cache(
   },
   ["trending-topics"],
   {
-    revalidate: 3 * 60 * 60,
+    revalidate: 3 * 60 * 60, //Will revalidate every 3 hours
   },
 );
 
