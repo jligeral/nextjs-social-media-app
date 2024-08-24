@@ -19,7 +19,7 @@ export default function ForYouFeed() {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["posts", "for-you"],
+    queryKey: ["post-feed", "for-you"],
     queryFn: ({ pageParam }) =>
       kyInstance
         .get(
@@ -56,6 +56,7 @@ export default function ForYouFeed() {
         <Post key={post.id} post={post} />
       ))}
       {isFetchingNextPage && <Loader2 className={`mx-auto animate-spin`}/>}
+
     </InfiniteScrollContainer>
   )
 }
