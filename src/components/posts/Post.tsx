@@ -19,11 +19,11 @@ export default function Post({ post }: PostProps) {
     <article className={`group/delete space-y-3 rounded-2xl bg-card shadow-sm p-5`}>
       <div className={`flex justify-between gap-3`}>
         <div className={`flex flex-wrap gap-3`}>
-          <Link href={`/user/${post.user.username}`}>
+          <Link href={`/users/${post.user.username}`}>
             <UserAvatar avatarUrl={post.user.avatarUrl}/>
           </Link>
           <div>
-            <Link href={`/user/${post.user.username}`}
+            <Link href={`/users/${post.user.username}`}
                   className="block font-medium hover:underline"
             >
               {post.user.displayName}
