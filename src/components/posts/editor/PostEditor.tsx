@@ -11,10 +11,11 @@ import LoadingButton from "@/components/LoadingButton";
 import "./styles.css";
 import {useSubmitPostMutation} from "@/components/posts/editor/mutations";
 import useMediaUpload, {Attachment} from "@/components/posts/editor/useMediaUpload";
-import {useRef} from "react";
+import { ClipboardEvent, useRef } from "react";
 import {ImageIcon, Loader2, X} from "lucide-react";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
+import { useDropzone } from "@uploadthing/react";
 
 export default function PostEditor() {
 
@@ -28,6 +29,12 @@ export default function PostEditor() {
     removeAttachment,
     reset: resetMediaUploads,
   } = useMediaUpload();
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: startUpload,
+  })
+
+  const { onClick, ...rootProps } = getRootProps();
 
   const mutation = useSubmitPostMutation();
 
@@ -59,14 +66,25 @@ export default function PostEditor() {
     });
   }
 
+  function onPaste(event: ClipboardEvent<HTMLInputElement>) {
+    const files = Array.from(event.clipboardData.items)
+      .filter((item) => item.kind === "file")
+      .map((item) => item.getAsFile() as File);
+    startUpload(files);
+  }
+
   return(
     <div className="flex flex-col gap-5 rounded-2xl bg-card p-5 shadow-sm">
       <div className="flex gap-5">
         <UserAvatar avatarUrl={user.avatarUrl} className="hidden sm:inline" />
-        <EditorContent
-          editor={editor}
-          className="w-full max-h-[20-rem] overflow-y-auto bg-background rounded-2xl px-5 py-3"
-        />
+        <div {...rootProps} className={`w-full`}>
+          <EditorContent
+            editor={editor}
+            className={cn("w-full max-h-[20-rem] overflow-y-auto bg-background rounded-2xl px-5 py-3", isDragActive && "outline-dashed")}
+            onPaste={onPaste}
+          />
+          <input {...getInputProps()} />
+        </div>
       </div>
       {!!attachments.length && (
         <AttachmentPreviews
