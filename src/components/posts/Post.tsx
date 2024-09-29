@@ -37,8 +37,9 @@ export default function Post({ post }: PostProps) {
               </Link>
             </UserTooltip>
             <Link
-              href={post.id}
+              href={`/posts/${post.id}`}
               className="block text-sm text-muted-foreground hover:underline"
+              suppressHydrationWarning // This is to remove the warning message if trying to view page immediately after creating a post
             >
               {formatRelativeDate(post.createdAt)}
             </Link>
