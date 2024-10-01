@@ -8,6 +8,7 @@ import {lucia} from "@/auth";
 import {cookies} from "next/headers";
 import {redirect} from "next/navigation";
 import {isRedirectError} from "next/dist/client/components/redirect";
+import streamServerClient from "@/lib/stream";
 
 export async function signUp(
   credentials: SignUpValues
@@ -50,15 +51,23 @@ export async function signUp(
       return {error: "Email already exists"};
     }
 
-    await prisma.user.create({
-      data: {
+    await prisma.$transaction(async (tx) => {
+      await tx.user.create({
+        data: {
+          id: userId,
+          username,
+          displayName: username,
+          email,
+          passwordHash,
+        },
+      });
+      /* Stream action will only work if prisma action works; must go second */
+      await streamServerClient.upsertUser({
         id: userId,
         username,
-        displayName: username,
-        email,
-        passwordHash,
-      },
-    });
+        name: username,
+      })
+    })
 
     const session = await lucia.createSession(userId, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
