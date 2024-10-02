@@ -9,7 +9,11 @@ import {Button} from "@/components/ui/button";
 import InfiniteScrollContainer from "@/components/InfiniteScrollContainer";
 import PostsLoadingSkeleton from "@/components/posts/PostsLoadingSkeleton";
 
-export default function Bookmarks() {
+interface SearchResultsProps {
+  query: string
+}
+
+export default function SearchResults({query}: SearchResultsProps) {
 
   const {
     data,
@@ -19,16 +23,22 @@ export default function Bookmarks() {
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
-    queryKey: ["post-feed", "bookmarks"],
+    queryKey: ["post-feed", "search", query],
     queryFn: ({ pageParam }) =>
       kyInstance
         .get(
-          "/api/posts/bookmarked",
-          pageParam ? { searchParams: { cursor: pageParam } } : {},
+          "/api/search",
+          {
+            searchParams: {
+              q: query,
+              ...(pageParam ? {cursor: pageParam} : {})
+            }
+          }
         )
         .json<PostsPage>(),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
+    gcTime: 0
   });
 
   const posts = data?.pages.flatMap((page) => page.posts) || [];
@@ -39,18 +49,18 @@ export default function Bookmarks() {
 
   if (status === 'success' && !posts.length && !hasNextPage) {
     return <p className={`text-center text-muted-foreground`}>
-      You haven&apos;t bookmarked any posts yet.
+      No results found for &quot;{query}&quot;
     </p>
   }
 
   if (status === 'error') {
     return <p className={`text-center text-destructive`}>
-      An error occurred loading the feed. Please try again later.
+      An error occurred loading posts. Please try again later.
     </p>
   }
   return (
     <InfiniteScrollContainer className={`space-y-5`}
-    onBottomReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
+                             onBottomReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
     >
       {posts.map(post => (
         <Post key={post.id} post={post} />
